@@ -1,0 +1,94 @@
+name: wireshark-win11
+
+services:
+  windows-base:
+    image: wireshark-win11/windows-base:11
+    profiles: ["base"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: windows-base
+    devices:
+      - /dev/kvm
+      - /dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: "1"
+      net.ipv6.conf.default.disable_ipv6: "1"
+    environment:
+      VERSION: "11"
+      RAM_SIZE: "4G"
+      CPU_CORES: "2"
+      DISK_SIZE: "64G"
+      USERNAME: "Docker"
+      PASSWORD: "admin"
+      LANGUAGE: "English"
+      REGION: "en-US"
+      KEYBOARD: "en-US"
+    ports:
+      - "8016:8006"
+      - "3390:3389/tcp"
+      - "3390:3389/udp"
+    volumes:
+      - windows-base-storage:/storage
+    stop_grace_period: 2m
+
+  wireshark-build:
+    image: wireshark-win11/wireshark-build:4.6.9
+    profiles: ["build"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build
+      args:
+        WIRESHARK_REF: v4.6.9
+    environment:
+      JOBS: "2"
+      WIRESHARK_VERSION_EXTRA: "-Win11Docker"
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: "1"
+      net.ipv6.conf.default.disable_ipv6: "1"
+    volumes:
+      - ./dist:/out
+      - wireshark-build:/src/wireshark/build
+      - ccache:/var/cache/ccache
+
+  wireshark-runtime:
+    image: wireshark-win11/wireshark-runtime:4.6.9
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    devices:
+      - /dev/kvm
+      - /dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: "1"
+      net.ipv6.conf.default.disable_ipv6: "1"
+    environment:
+      VERSION: "11"
+      RAM_SIZE: "4G"
+      CPU_CORES: "2"
+      DISK_SIZE: "120G"
+      USERNAME: "Docker"
+      PASSWORD: "admin"
+      LANGUAGE: "English"
+      REGION: "en-US"
+      KEYBOARD: "en-US"
+    ports:
+      - "8006:8006"
+      - "3389:3389/tcp"
+      - "3389:3389/udp"
+    volumes:
+      - wireshark-runtime-storage:/storage
+      - ./dist:/shared
+    stop_grace_period: 2m
+
+volumes:
+  windows-base-storage:
+  wireshark-runtime-storage:
+  wireshark-build:
+  ccache:
