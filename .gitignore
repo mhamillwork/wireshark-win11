@@ -1,0 +1,5 @@
+dist/*
+!dist/.gitkeep
+images/*.tar
+images/*.iso
+*.qcow2

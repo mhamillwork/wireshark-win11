@@ -1,0 +1,7 @@
+.git
+dist
+images
+*.tar
+*.iso
+*.qcow2
+**/.DS_Store
