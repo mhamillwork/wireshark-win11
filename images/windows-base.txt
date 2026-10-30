@@ -1,7 +1,10 @@
 name: wireshark-win11/windows-base
 tag: "11"
+also_contains: wireshark-win11/wireshark-runtime:4.6.9
 upstream: dockurr/windows:6.06
 manifest_digest: sha256:16fd7c39a3e48bb946d29c59dc6015942e5b900a1fa5d7e5552053bfc48ee2ea
 guest: Windows 11 Pro
-upstream_amd64_bytes: 239048062
-archive: images/windows-base.tar
+archive: images/windows-base/windows-images.tar
+archive_bytes: 239100416
+part_size: 48M
+archive_sha256: 0c011f1d6877735e2ba8e67e33d0f8a7b5307f561af6cc28ebaa0fa5d4edc4b7

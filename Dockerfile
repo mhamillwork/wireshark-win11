@@ -8,6 +8,7 @@
 ARG WINDOWS_BASE_REF=dockurr/windows:6.06@sha256:16fd7c39a3e48bb946d29c59dc6015942e5b900a1fa5d7e5552053bfc48ee2ea
 ARG FEDORA_REF=fedora:43
 ARG WIRESHARK_REF=v4.6.9
+ARG WINDOWS_BASE_IMAGE=windows-base
 
 # Windows 11 Pro base. The guest is installed on first launch (VERSION=11).
 FROM ${WINDOWS_BASE_REF} AS windows-base
@@ -60,7 +61,11 @@ ENTRYPOINT ["/usr/local/bin/build-windows-installer.sh"]
 
 # Runtime image. Same Windows 11 base, with first-boot automation that
 # silent-installs the installer produced by the build image and starts Wireshark.
-FROM windows-base AS runtime
+# WINDOWS_BASE_IMAGE defaults to the stage above. On an isolated network, load
+# the vendored archive and pass wireshark-win11/windows-base:11 so this build
+# does not pull dockurr/windows.
+ARG WINDOWS_BASE_IMAGE
+FROM ${WINDOWS_BASE_IMAGE} AS runtime
 
 COPY oem/runtime/ /oem/
 COPY automation/build-windows-installer.ps1 /oem/build-windows-installer.ps1

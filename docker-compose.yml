@@ -60,6 +60,9 @@ services:
       context: .
       dockerfile: Dockerfile
       target: runtime
+      args:
+        # Isolated rebuild: wireshark-win11/windows-base:11 after load-images.sh
+        WINDOWS_BASE_IMAGE: ${WINDOWS_BASE_IMAGE:-windows-base}
     devices:
       - /dev/kvm
       - /dev/net/tun
@@ -85,6 +88,9 @@ services:
     volumes:
       - wireshark-runtime-storage:/storage
       - ./dist:/shared
+      # Isolated network: mount a local Windows 11 ISO so the first boot
+      # does not download one. dockurr skips VERSION when this file is set.
+      # - ./win11x64.iso:/custom.iso
     stop_grace_period: 2m
 
 volumes:
